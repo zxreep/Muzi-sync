@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+  <form method="POST" class="max-w-md mx-auto space-y-4">
+    <h2 class="text-lg">Join a Room</h2>
+    <div>
+      <label>Room ID:</label>
+      <input name="room_id" class="w-full p-2 rounded bg-gray-700" required/>
+    </div>
+    <div>
+      <label>Your Name (optional):</label>
+      <input name="name" class="w-full p-2 rounded bg-gray-700"/>
+    </div>
+    <button type="submit" class="w-full p-2 bg-green-600 rounded">Join</button>
+  </form>
+{% endblock %}

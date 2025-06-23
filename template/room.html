@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="space-y-4">
+    <h2 class="text-xl">Room: {{ room }}</h2>
+    {% if role=='host' %}
+    <div class="space-y-2">
+      <p>Media Type: {{ media_type }}</p>
+      <div class="flex space-x-2">
+        <input id="songName" type="text" placeholder="Song or YouTube URL" class="flex-grow p-2 rounded bg-gray-700"/>
+        <button onclick="downloadMedia()" class="px-4 py-2 bg-blue-600 rounded">Load</button>
+      </div>
+      <div class="flex space-x-2">
+        <button onclick="send('play')" class="px-4 py-2 bg-gray-600 rounded">Play</button>
+        <button onclick="send('pause')" class="px-4 py-2 bg-gray-600 rounded">Pause</button>
+        <input type="range" min="0" max="1" step="0.01" onchange="volume(this.value)"/>
+        <button onclick="sendEnd()" class="px-4 py-2 bg-red-600 rounded">End Session</button>
+      </div>
+    </div>
+    {% else %}
+    <div class="space-y-2">
+      <label><input type="radio" name="view" value="black" onclick="setView('black')" checked/> Black</label>
+      <label><input type="radio" name="view" value="spectrum" onclick="setView('spectrum')"/> Spectrum</label>
+      <div id="playerArea" class="w-full h-64 bg-black flex items-center justify-center"></div>
+    </div>
+    {% endif %}
+  </div>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+    const room = "{{ room }}";
+    const role = "{{ role }}";
+    const mediaType = "{{ media_type }}";
+    socket.emit('join', {room});
+    function send(cmd, url=null){
+      socket.emit('command', {command: cmd, room, url});
+    }
+    function downloadMedia(){
+      const val = document.getElementById('songName').value;
+      fetch(`/download?song=${encodeURIComponent(val)}`)
+        .then(r=>r.json()).then(data=>{
+          if(data.error) alert(data.error);
+          else send('song', data.url);
+        });
+    }
+    function volume(v){
+      socket.emit('command', {command:'volume', value:parseFloat(v), room});
+    }
+    function sendEnd(){
+      socket.emit('end', {room});
+    }
+    let audio, video, spectrum;
+    socket.on('command', data=>{
+      if(role==='player'){
+        if(data.command==='song' || data.command==='video'){
+          if(mediaType==='audio'){
+            if(!audio){
+              audio=document.createElement('audio');
+              audio.controls=true;
+              audio.autoplay=true;
+              document.getElementById('playerArea').appendChild(audio);
+            }
+            audio.src=data.url;
+            audio.play();
+          } else {
+            if(!video){
+              video=document.createElement('video');
+              video.controls=true;
+              video.autoplay=true;
+              video.width=640;
+              document.getElementById('playerArea').appendChild(video);
+            }
+            video.src=data.url;
+            video.play();
+          }
+        }
+        if(data.command==='play') audio && audio.play();
+        if(data.command==='pause') audio && audio.pause();
+        if(data.command==='volume') {
+          if(audio) audio.volume=data.value;
+          if(video) video.volume=data.value;
+        }
+      }
+    });
+    socket.on('end', ()=> location.href='/');
+    function setView(v){
+      const area=document.getElementById('playerArea');
+      area.innerHTML='';
+      if(v==='black') area.style.background='black';
+      if(v==='spectrum'){
+        area.style.background='linear-gradient(90deg, #0f0, #00f)';
+        // placeholder for spectrum effect
+      }
+    }
+  </script>
+{% endblock %}

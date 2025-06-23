@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="text-center space-y-6">
+    <h2 class="text-xl">Welcome to SyncMVP</h2>
+    <p>Sync audio or video with friends in real time.</p>
+    <a href="{{ url_for('create') }}" class="px-4 py-2 bg-blue-600 rounded">Create Room</a>
+    <a href="{{ url_for('join') }}" class="px-4 py-2 bg-green-600 rounded">Join Room</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+  <form method="POST" class="max-w-md mx-auto space-y-4">
+    <h2 class="text-lg">Create a Room</h2>
+    <div>
+      <label>Media Type:</label>
+      <select name="media_type" class="w-full p-2 rounded bg-gray-700">
+        <option value="audio">Audio Sync</option>
+        <option value="video">Video Sync</option>
+      </select>
+    </div>
+    <div>
+      <label>Visibility:</label>
+      <select name="visibility" class="w-full p-2 rounded bg-gray-700" onchange="
+        document.getElementById('passDiv').style.display = this.value==='private'?'block':'none'">
+        <option value="public">Public</option>
+        <option value="private">Private</option>
+      </select>
+    </div>
+    <div id="passDiv" style="display:none;">
+      <label>Password:</label>
+      <input type="password" name="password" class="w-full p-2 rounded bg-gray-700"/>
+    </div>
+    <button type="submit" class="w-full p-2 bg-blue-600 rounded">Create</button>
+  </form>
+{% endblock %}
