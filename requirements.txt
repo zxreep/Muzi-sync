@@ -1,0 +1,6 @@
+Flask
+Flask-SocketIO
+eventlet
+yt-dlp
+youtube_dl
+gunicorn
